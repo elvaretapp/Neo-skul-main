@@ -1,0 +1,19 @@
+/* App.css - Main application styles */
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app>* {
+    flex-shrink: 0;
+}
+
+.app>main {
+    flex: 1;
+}
+
+.status-badge { padding: 5px 10px; borderRadius: 20px; font-size: 0.8rem; font-weight: bold; color: white; }
+.status-badge.pending { background-color: #f0ad4e; }
+.status-badge.approved { background-color: #28a745; }
+.status-badge.rejected { background-color: #dc3545; }

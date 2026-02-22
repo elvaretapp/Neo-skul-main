@@ -1,0 +1,487 @@
+/* Header.css - Enhanced Header Styling */
+
+/* ===================================
+   BUTTON STYLES
+   =================================== */
+
+/* Icon spacing in all buttons */
+.btn i {
+    margin-right: 6px;
+}
+
+/* Primary button enhancements */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left 0.3s ease;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Secondary button enhancements */
+.btn-secondary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+}
+
+/* ===================================
+   BUTTON CONSISTENCY
+   =================================== */
+
+/* Ensure all nav buttons are consistent */
+.nav-links .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Better spacing between icon and text */
+.nav-links .btn i {
+    margin-right: 6px;
+    font-size: 0.9em;
+}
+
+/* ===================================
+   LOGO STYLES
+   =================================== */
+
+.logo-dashboard-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo {
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo img {
+    transition: filter 0.3s ease;
+}
+
+.logo:hover img {
+    filter: brightness(1.1);
+}
+
+/* Profile Dropdown Styles */
+
+
+/* Profile Dropdown Menu */
+.profile-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 250px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownSlideIn 0.3s ease;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.profile-role {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.profile-dropdown-divider {
+    height: 1px;
+    background: #e9ecef;
+}
+
+.profile-dropdown-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    color: #2d3748;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.profile-dropdown-item:hover {
+    background: #f8f9fa;
+}
+
+.profile-dropdown-item i {
+    width: 20px;
+    font-size: 1rem;
+    color: #667eea;
+}
+
+.profile-dropdown-item.logout {
+    color: #ef4444;
+}
+
+.profile-dropdown-item.logout i {
+    color: #ef4444;
+}
+
+.profile-dropdown-item.logout:hover {
+    background: #fee2e2;
+}
+
+/* Nav Profile Styles */
+.nav-profile-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.nav-profile-link:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.nav-profile-link i {
+    font-size: 1.5rem;
+}
+
+.nav-profile-dropdown {
+    position: relative;
+}
+
+.nav-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.nav-profile-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.nav-profile-btn i {
+    font-size: 1.5rem;
+}
+
+/* Nav dropdown positioning */
+.profile-dropdown-menu.nav-dropdown {
+    right: 0;
+    left: auto;
+}
+
+/* ===================================
+   NAVIGATION LINKS
+   =================================== */
+
+.nav-link {
+    position: relative;
+    transition: color 0.3s ease;
+    padding: 8px 0;
+}
+
+/* Underline animation */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Active link state */
+.nav-link.active {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* ===================================
+   MOBILE MENU
+   =================================== */
+
+.mobile-menu {
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.mobile-menu:hover {
+    transform: scale(1.1);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.mobile-menu:active {
+    transform: scale(0.95);
+}
+
+/* ===================================
+   HEADER LAYOUT
+   =================================== */
+
+/* Better spacing for nav items */
+.nav-links {
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-links li {
+    display: flex;
+    align-items: center;
+}
+
+/* Action button (Login/Logout) spacing */
+.nav-links li:has(.btn) {
+    margin-left: 15px;
+    padding-left: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+
+    /* Smaller icon spacing on mobile */
+    .btn i {
+        margin-right: 4px;
+        font-size: 0.85em;
+    }
+
+    /* Hide underline animation on mobile */
+    .nav-link::after {
+        display: none;
+    }
+
+    /* Better mobile menu spacing */
+    .nav-links.active {
+        gap: 15px;
+        padding: 20px;
+    }
+
+    /* Full width button on mobile */
+    .nav-links.active li {
+        width: 100%;
+    }
+
+    .nav-links.active .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Remove separator on mobile */
+    .nav-links.active li:has(.btn) {
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    /* Adjust logo-dashboard wrapper for mobile */
+
+
+    /* Adjust dropdown menu for mobile */
+    .profile-dropdown-menu {
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Even smaller spacing on small phones */
+    .nav-links {
+        gap: 10px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+    }
+
+    .btn i {
+        font-size: 0.8rem;
+    }
+
+    /* Extra small profile button */
+
+
+
+
+    /* Smaller dropdown menu */
+    .profile-dropdown-menu {
+        min-width: 200px;
+        font-size: 0.85rem;
+    }
+
+    .profile-dropdown-header {
+        padding: 12px;
+    }
+
+    .profile-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY IMPROVEMENTS
+   =================================== */
+
+/* Focus states - completely clean, no outline or shadow */
+.nav-link:focus,
+.btn:focus,
+.mobile-menu:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Remove outline on active/click */
+.nav-link:active,
+.btn:active,
+.mobile-menu:active {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Focus visible for keyboard navigation - also clean */
+.nav-link:focus-visible,
+.btn:focus-visible,
+.mobile-menu:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Better touch targets on mobile */
+@media (hover: none) and (pointer: coarse) {
+
+    .nav-link,
+    .btn,
+    .mobile-menu {
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* ===================================
+   SMOOTH TRANSITIONS
+   =================================== */
+
+/* Smooth color transitions */
+.header * {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent layout shift on hover */
+.nav-link,
+.btn {
+    will-change: transform;
+}
