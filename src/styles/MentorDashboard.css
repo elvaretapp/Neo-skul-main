@@ -784,3 +784,35 @@
 
 .text-green { color: #16a34a !important; }
 .text-red { color: #dc2626 !important; }
+
+/* =============================================
+   COURSE LINK STATUS BADGES
+   ============================================= */
+.course-links-status {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.link-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.link-badge.has-link {
+    background: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.link-badge.no-link {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+}

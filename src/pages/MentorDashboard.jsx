@@ -18,7 +18,8 @@ function MentorDashboard() {
     const [profileData, setProfileData] = useState({
         id: '', username: '', email: '', specialization: '', bio: '',
         avatar: '', rating: 0, created_at: '', category: '',
-        is_active: 1, schedule: {}, price_per_session: 0
+        is_active: 1, schedule: {}, price_per_session: 0,
+        cv_link: '', phone: ''
     })
 
     // Upload State
@@ -77,7 +78,9 @@ function MentorDashboard() {
                     category: userData.category || '',
                     is_active: userData.is_active !== undefined ? parseInt(userData.is_active) : 1,
                     schedule: parsedSchedule,
-                    price_per_session: userData.price_per_session || 0
+                    price_per_session: userData.price_per_session || 0,
+                    cv_link: userData.cv_link || '',
+                    phone: userData.phone || ''
                 })
             }
 
@@ -163,6 +166,8 @@ function MentorDashboard() {
             formData.append('category', profileData.category)
             formData.append('price_per_session', profileData.price_per_session)
             formData.append('schedule', JSON.stringify(profileData.schedule))
+            formData.append('cv_link', profileData.cv_link || '')
+            formData.append('phone', profileData.phone || '')
             if (avatarFile) formData.append('avatar', avatarFile)
 
             const res = await fetch('/api/users.php', { method: 'POST', body: formData })
@@ -186,6 +191,9 @@ function MentorDashboard() {
             formData.append('price', data.price)
             formData.append('type', data.type)
             formData.append('mentor_id', mentorId)
+            formData.append('drive_link', data.drive_link || '')
+            formData.append('wa_group', data.wa_group || '')
+            formData.append('wa_mentor', data.wa_mentor || '')
             if (data.image instanceof File) formData.append('image', data.image)
 
             if (modalMode === 'delete') {
@@ -323,6 +331,20 @@ function MentorDashboard() {
                                     <div className="card-body">
                                         <h3>{course.title}</h3>
                                         <p className="price">{formatRupiah(course.price)}</p>
+                                        
+                                        {/* Status Link */}
+                                        <div className="course-links-status">
+                                            <span className={`link-badge ${course.drive_link ? 'has-link' : 'no-link'}`} title={course.drive_link || 'Belum ada link'}>
+                                                <i className="fab fa-google-drive"></i>
+                                            </span>
+                                            <span className={`link-badge ${course.wa_group ? 'has-link' : 'no-link'}`} title={course.wa_group || 'Belum ada WA Grup'}>
+                                                <i className="fab fa-whatsapp"></i> Grup
+                                            </span>
+                                            <span className={`link-badge ${course.wa_mentor ? 'has-link' : 'no-link'}`} title={course.wa_mentor || 'Belum ada WA Mentor'}>
+                                                <i className="fab fa-whatsapp"></i> Mentor
+                                            </span>
+                                        </div>
+
                                         <div className="card-actions">
                                             <button className="btn-icon edit" onClick={() => handleEdit(course)}><i className="fas fa-edit"></i></button>
                                             <button className="btn-icon delete" onClick={() => handleDelete(course)}><i className="fas fa-trash"></i></button>
@@ -440,6 +462,16 @@ function MentorDashboard() {
                                     </select>
                                 </div>
                                 <div className="form-group"><label>Bio</label><textarea name="bio" value={profileData.bio} onChange={handleProfileChange} rows="5"></textarea></div>
+                                <div className="form-group">
+                                    <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Nomor WhatsApp</label>
+                                    <input type="text" name="phone" value={profileData.phone} onChange={handleProfileChange} placeholder="Contoh: 6281234567890" />
+                                    <small style={{color:'#94a3b8', fontSize:'0.78rem'}}>Format: 62xxx (tanpa + dan spasi)</small>
+                                </div>
+                                <div className="form-group">
+                                    <label><i className="fas fa-file-pdf" style={{marginRight:'6px', color:'#ef4444'}}></i>Link CV (Google Drive)</label>
+                                    <input type="url" name="cv_link" value={profileData.cv_link} onChange={handleProfileChange} placeholder="https://drive.google.com/..." />
+                                    <small style={{color:'#94a3b8', fontSize:'0.78rem'}}>Upload CV ke Google Drive, lalu paste linknya di sini</small>
+                                </div>
                                 <div className="form-actions"><button type="submit" className="btn-save-profile">Simpan Perubahan</button></div>
                             </div>
                         </form>

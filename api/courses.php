@@ -39,6 +39,9 @@ switch ($method) {
         $type = $_POST['type'] ?? 'General';
         $mentor_id = $_POST['mentor_id'] ?? null;
         $id = $_POST['id'] ?? null;
+        $drive_link = $_POST['drive_link'] ?? '';
+        $wa_group = $_POST['wa_group'] ?? '';
+        $wa_mentor = $_POST['wa_mentor'] ?? '';
 
         if (!$id && !$mentor_id) {
             http_response_code(400);
@@ -64,14 +67,13 @@ switch ($method) {
             if ($id) {
                 // === UPDATE ===
                 if ($imagePath) {
-                    // Update field 'image'
-                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, image=? WHERE id=?";
+                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, image=?, drive_link=?, wa_group=?, wa_mentor=? WHERE id=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->execute([$title, $description, $price, $type, $imagePath, $id]);
+                    $stmt->execute([$title, $description, $price, $type, $imagePath, $drive_link, $wa_group, $wa_mentor, $id]);
                 } else {
-                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=? WHERE id=?";
+                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, drive_link=?, wa_group=?, wa_mentor=? WHERE id=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->execute([$title, $description, $price, $type, $id]);
+                    $stmt->execute([$title, $description, $price, $type, $drive_link, $wa_group, $wa_mentor, $id]);
                 }
                 echo json_encode(["message" => "Course updated successfully"]);
 
@@ -79,11 +81,10 @@ switch ($method) {
                 // === CREATE ===
                 if (!$imagePath) $imagePath = '/assets/images/products/Tamplateedukasi.jpeg';
 
-                // Insert ke field 'image'
-                $sql = "INSERT INTO courses (title, description, price, type, image, mentor_id) VALUES (?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO courses (title, description, price, type, image, mentor_id, drive_link, wa_group, wa_mentor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 
-                if($stmt->execute([$title, $description, $price, $type, $imagePath, $mentor_id])) {
+                if($stmt->execute([$title, $description, $price, $type, $imagePath, $mentor_id, $drive_link, $wa_group, $wa_mentor])) {
                     echo json_encode(["message" => "Course created successfully"]);
                 } else {
                     http_response_code(500);

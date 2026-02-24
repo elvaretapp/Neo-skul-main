@@ -4,7 +4,7 @@ import "../styles/CRUDModal.css";
 function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
   const [formData, setFormData] = useState({
     id: "",
-    name: "", // Di React kita pakai 'name' untuk input
+    name: "",
     email: "",
     role: "client",
     status: "active",
@@ -13,6 +13,9 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
     price: "",
     image: null,
     type: "",
+    drive_link: "",
+    wa_group: "",
+    wa_mentor: "",
   });
 
   useEffect(() => {
@@ -23,6 +26,11 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
         name: data.name || data.username || "", 
         image: null,
         type: data.type || data.category || "",
+        // Tambahkan ini:
+        price: data.price ? Math.round(data.price) : "",
+        drive_link: data.drive_link || "",
+        wa_group: data.wa_group || "",
+        wa_mentor: data.wa_mentor || "",
       });
     } else {
       setFormData({
@@ -36,6 +44,9 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
         price: "",
         image: null,
         type: "",
+        drive_link: "",
+        wa_group: "",
+        wa_mentor: "",
       });
     }
   }, [data, mode, isOpen]);
@@ -137,13 +148,12 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
                   <div className="form-group">
                     <label>Price</label>
                     <input
-                      type="text"
+                      type="number"
                       name="price"
                       value={formData.price}
-                      inputMode="numeric"
-                      pattern="[0-9]*"
+                      min="0"
                       required
-                      onChange={(e) => /^\d*$/.test(e.target.value) && handleChange(e)}
+                      onChange={handleChange}
                     />
                   </div>
                   <div className="form-group">
@@ -160,6 +170,18 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
                   <div className="form-group">
                     <label>Course Image (Upload)</label>
                     <input type="file" name="image" onChange={handleChange} accept="image/*" className="file-input" />
+                  </div>
+                  <div className="form-group">
+                    <label><i className="fab fa-google-drive" style={{marginRight:'6px', color:'#4285f4'}}></i>Link Google Drive (Materi)</label>
+                    <input type="url" name="drive_link" value={formData.drive_link || ''} onChange={handleChange} placeholder="https://drive.google.com/..." />
+                  </div>
+                  <div className="form-group">
+                    <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Link WA Grup</label>
+                    <input type="url" name="wa_group" value={formData.wa_group || ''} onChange={handleChange} placeholder="https://chat.whatsapp.com/..." />
+                  </div>
+                  <div className="form-group">
+                    <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Link WA Mentor</label>
+                    <input type="url" name="wa_mentor" value={formData.wa_mentor || ''} onChange={handleChange} placeholder="https://wa.me/628..." />
                   </div>
                 </>
               )}

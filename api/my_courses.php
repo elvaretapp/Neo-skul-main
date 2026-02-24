@@ -18,11 +18,20 @@ if (isset($_GET['user_id'])) {
                     c.title, 
                     c.image, 
                     c.type, 
-                    c.description, 
+                    c.description,
+                    c.drive_link,
+                    c.wa_group,
+                    c.wa_mentor,
+                    c.mentor_id,
+                    u.username as mentor_name,
+                    u.specialization as mentor_specialization,
+                    u.avatar as mentor_avatar,
+                    u.phone as mentor_phone,
                     t.created_at as purchase_date
                 FROM courses c
                 JOIN transaction_items ti ON c.id = ti.course_id
                 JOIN transactions t ON ti.transaction_id = t.id
+                LEFT JOIN users u ON c.mentor_id = u.id
                 WHERE t.user_id = :uid 
                 AND (t.status = 'approved' OR t.status = 'success') 
                 ORDER BY t.created_at DESC";

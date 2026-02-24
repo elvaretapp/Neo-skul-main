@@ -21,34 +21,37 @@ if (!$mentor_id) {
 }
 
 try {
-    // 1. Hitung Total Course
+    // 1. Total Course milik mentor ini
     $stmt = $conn->prepare("SELECT COUNT(*) as total FROM courses WHERE mentor_id = ?");
     $stmt->execute([$mentor_id]);
     $totalCourses = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    // 2. Hitung Total Siswa (Client yang sudah membeli - Transaksi Sukses)
-    // Menggunakan DISTINCT agar jika 1 siswa beli 2 kursus, tetap dihitung 1 orang
+    // 2. Total Siswa unik yang sudah beli kursus mentor ini (approved/success)
     $sqlStudents = "SELECT COUNT(DISTINCT t.user_id) as total 
                     FROM transactions t 
-                    JOIN courses c ON t.course_id = c.id 
-                    WHERE c.mentor_id = ? AND t.status = 'success'";
+                    JOIN transaction_items ti ON t.id = ti.transaction_id
+                    JOIN courses c ON ti.course_id = c.id
+                    WHERE c.mentor_id = ? 
+                    AND (t.status = 'approved' OR t.status = 'success')";
     $stmt = $conn->prepare($sqlStudents);
     $stmt->execute([$mentor_id]);
     $totalStudents = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    // 3. Hitung Total Pendapatan
-    $sqlRevenue = "SELECT SUM(t.amount) as total 
+    // 3. Total pendapatan dari kursus mentor yang terjual (approved/success)
+    $sqlRevenue = "SELECT SUM(ti.price) as total 
                    FROM transactions t 
-                   JOIN courses c ON t.course_id = c.id 
-                   WHERE c.mentor_id = ? AND t.status = 'success'";
+                   JOIN transaction_items ti ON t.id = ti.transaction_id
+                   JOIN courses c ON ti.course_id = c.id
+                   WHERE c.mentor_id = ? 
+                   AND (t.status = 'approved' OR t.status = 'success')";
     $stmt = $conn->prepare($sqlRevenue);
     $stmt->execute([$mentor_id]);
     $revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     echo json_encode([
-        "total_courses" => $totalCourses,
-        "total_students" => $totalStudents,
-        "total_revenue" => $revenue ? $revenue : 0
+        "total_courses"  => (int)$totalCourses,
+        "total_students" => (int)$totalStudents,
+        "total_revenue"  => $revenue ? (float)$revenue : 0
     ]);
 
 } catch (PDOException $e) {

@@ -47,6 +47,8 @@ switch ($method) {
             $category = $_POST['category'] ?? '';
             $price_per_session = $_POST['price_per_session'] ?? 0;
             $schedule = $_POST['schedule'] ?? '{}';
+            $cv_link = $_POST['cv_link'] ?? '';
+            $phone = $_POST['phone'] ?? '';
             
             // Logic Upload Avatar
             $avatarPath = null;
@@ -62,30 +64,15 @@ switch ($method) {
 
             try {
                 if ($avatarPath) {
-                    $sql = "UPDATE users SET username=?, email=?, specialization=?, bio=?, category=?, avatar=?, price_per_session=?, schedule=? WHERE id=?";
+                    $sql = "UPDATE users SET username=?, email=?, specialization=?, bio=?, category=?, avatar=?, price_per_session=?, schedule=?, cv_link=?, phone=? WHERE id=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->execute([$username, $email, $specialization, $bio, $category, $avatarPath, $price_per_session, $schedule, $userId]);
+                    $stmt->execute([$username, $email, $specialization, $bio, $category, $avatarPath, $price_per_session, $schedule, $cv_link, $phone, $userId]);
                 } else {
-                    $sql = "UPDATE users SET username=?, email=?, specialization=?, bio=?, category=?, price_per_session=?, schedule=? WHERE id=?";
+                    $sql = "UPDATE users SET username=?, email=?, specialization=?, bio=?, category=?, price_per_session=?, schedule=?, cv_link=?, phone=? WHERE id=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->execute([$username, $email, $specialization, $bio, $category, $price_per_session, $schedule, $userId]);
+                    $stmt->execute([$username, $email, $specialization, $bio, $category, $price_per_session, $schedule, $cv_link, $phone, $userId]);
                 }
                 echo json_encode(["message" => "Profile updated successfully"]);
-            } catch (PDOException $e) {
-                http_response_code(500);
-                echo json_encode(["message" => "Error: " . $e->getMessage()]);
-            }
-            exit();
-        }
-
-        // Toggle aktif/nonaktif
-        if (isset($_POST['action']) && $_POST['action'] === 'toggle_active') {
-            $userId = $_POST['id'];
-            $is_active = $_POST['is_active'];
-            try {
-                $stmt = $conn->prepare("UPDATE users SET is_active=? WHERE id=?");
-                $stmt->execute([$is_active, $userId]);
-                echo json_encode(["message" => "Status updated"]);
             } catch (PDOException $e) {
                 http_response_code(500);
                 echo json_encode(["message" => "Error: " . $e->getMessage()]);

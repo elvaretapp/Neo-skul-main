@@ -13,7 +13,8 @@ function Dashboard({ setIsLoggedIn }) {
     // State Data
     const [myCourses, setMyCourses] = useState([]) 
     const [loadingCourses, setLoadingCourses] = useState(true)
-    const [applicationStatus, setApplicationStatus] = useState('none') 
+    const [applicationStatus, setApplicationStatus] = useState('none')
+    const [myMentors, setMyMentors] = useState([]) 
 
     const mentors = [
         { id: 1, name: 'Debbi Angelia Saputri', title: 'Tutor Bahasa Arab', image: '/images/mentors/debbi.jpeg' },
@@ -40,49 +41,56 @@ function Dashboard({ setIsLoggedIn }) {
             setUsername(storedUsername || 'Pengguna')
             setIsLoading(false)
 
-            // --- 1. FETCH COURSES (KURSUS SAYA) ---
+            // --- 1. FETCH COURSES & MENTOR SAYA ---
             if(userId) {
-                console.log("DEBUG: Memulai fetch ke API my_courses.php...");
-                
-                // Pastikan URL benar: /neo-skul/api/...
-                fetch(`http://localhost/neo-skul/api/my_courses.php?user_id=${userId}`)
+                fetch(`/api/my_courses.php?user_id=${userId}`)
                     .then(res => {
-                        // Cek apakah response OK (status 200)
-                        if (!res.ok) {
-                            throw new Error(`HTTP error! status: ${res.status}`);
-                        }
-                        return res.text(); // Ambil text dulu untuk jaga-jaga bukan JSON
+                        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                        return res.json();
                     })
-                    .then(text => {
-                        console.log("DEBUG: Response Mentah dari Server:", text);
-                        try {
-                            const data = JSON.parse(text); // Baru parse ke JSON
-                            console.log("DEBUG: Data JSON Berhasil Diparse:", data);
-                            
-                            if (Array.isArray(data)) {
-                                setMyCourses(data);
-                            } else {
-                                console.warn("DEBUG: Data bukan array!", data);
-                                setMyCourses([]);
-                            }
-                        } catch (e) {
-                            console.error("DEBUG: Error Parse JSON:", e);
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            setMyCourses(data);
+
+                            // Build mentor unik dari data kursus
+                            const mentorMap = {}
+                            data.forEach(course => {
+                                if (course.mentor_id) {
+                                    if (!mentorMap[course.mentor_id]) {
+                                        mentorMap[course.mentor_id] = {
+                                            id: course.mentor_id,
+                                            name: course.mentor_name || 'Mentor',
+                                            title: course.mentor_specialization || 'Mentor',
+                                            image: course.mentor_avatar || '',
+                                            phone: course.mentor_phone || '',
+                                            courses: [course.title]
+                                        }
+                                    } else {
+                                       
+                                        if (!mentorMap[course.mentor_id].courses.includes(course.title)) {
+                                            mentorMap[course.mentor_id].courses.push(course.title)
+                                        }
+                                    }
+                                }
+                            })
+                            setMyMentors(Object.values(mentorMap))
+                        } else {
+                            setMyCourses([])
                         }
                         setLoadingCourses(false);
                     })
                     .catch(err => {
-                        console.error("DEBUG: Gagal Fetch Kursus:", err);
+                        console.error("Gagal Fetch Kursus:", err);
                         setLoadingCourses(false);
                     })
             } else {
-                console.error("DEBUG: User ID Kosong, tidak bisa fetch courses.");
                 setLoadingCourses(false);
             }
 
             // --- 2. CEK STATUS MENTOR (OPTIONAL) ---
-            // Saya bungkus try-catch agar tidak mematikan halaman jika error
+          
             if (userId) {
-                fetch(`http://localhost/neo-skul/api/mentor_applications.php?user_id=${userId}`)
+                fetch(`/api/mentor_applications.php?user_id=${userId}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data && data.status) {
@@ -101,7 +109,7 @@ function Dashboard({ setIsLoggedIn }) {
         if (!confirm("Apakah Anda yakin ingin mengajukan diri sebagai mentor?")) return;
 
         try {
-            const response = await fetch('http://localhost/neo-skul/api/mentor_applications.php', {
+            const response = await fetch('/api/mentor_applications.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId })
@@ -202,57 +210,46 @@ function Dashboard({ setIsLoggedIn }) {
                             ) : (
                                 <div className="courses-grid">
                                     {myCourses.map(course => (
-                                        <div key={course.id} className="course-card-dashboard" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+                                        <div key={course.id} className="course-card-dashboard" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                                             
-                                            {/* --- GAMBAR KURSUS --- */}
                                             <img 
-                                                /* Menggunakan path dari database + path server */
-                                                src={`http://localhost/neo-skul${course.image}`} 
+                                                src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${course.image}`}
                                                 alt={course.title} 
-                                                style={{
-                                                    width: '100%', 
-                                                    height: '150px', 
-                                                    objectFit: 'cover'
-                                                }} 
-                                                onError={(e) => {
-                                                    // Fallback jika gambar rusak/tidak ketemu
-                                                    console.log("Gambar error, pakai default.");
-                                                    e.target.src = '/assets/images/products/Tamplateedukasi.jpeg';
-                                                }}
+                                                style={{ width: '100%', height: '150px', objectFit: 'cover' }} 
+                                                onError={(e) => { e.target.src = '/assets/images/products/Tamplateedukasi.jpeg'; }}
                                             />
                                             
-                                            {/* --- INFO KURSUS --- */}
                                             <div className="course-info" style={{ padding: '15px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                                                <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>{course.title}</h3>
+                                                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px' }}>{course.title}</h3>
                                                 
-                                                <span className="course-type" style={{ 
-                                                    fontSize: '12px', 
-                                                    background: '#e0f2fe', 
-                                                    color: '#0284c7', 
-                                                    padding: '4px 8px', 
-                                                    borderRadius: '4px',
-                                                    width: 'fit-content',
-                                                    marginBottom: '10px'
-                                                }}>
+                                                <span style={{ fontSize: '12px', background: '#e0f2fe', color: '#0284c7', padding: '3px 8px', borderRadius: '4px', width: 'fit-content', marginBottom: '10px' }}>
                                                     {course.type}
                                                 </span>
 
-                                                <p style={{
-                                                    fontSize: '14px',
-                                                    color: '#666',
-                                                    margin: '0 0 15px 0',
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 3,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    overflow: 'hidden',
-                                                    lineHeight: '1.5'
-                                                }}>
+                                                <p style={{ fontSize: '13px', color: '#666', margin: '0 0 15px 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.5' }}>
                                                     {course.description || "Tidak ada deskripsi."}
                                                 </p>
 
-                                                <button className="btn-start" style={{ marginTop: 'auto', width: '100%', padding: '10px', background: '#0056b3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                                    Mulai Belajar
-                                                </button>
+                                                {/* --- LINK AKSES MATERI --- */}
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+                                                    {course.drive_link ? (
+                                                        <a href={course.drive_link} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 14px', background: '#4285f4', color: 'white', borderRadius: '7px', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}>
+                                                            <i className="fab fa-google-drive"></i> Akses Materi
+                                                        </a>
+                                                    ) : (
+                                                        <span style={{ fontSize: '12px', color: '#aaa', fontStyle: 'italic' }}>Materi belum tersedia</span>
+                                                    )}
+                                                    {course.wa_group && (
+                                                        <a href={course.wa_group} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 14px', background: '#25d366', color: 'white', borderRadius: '7px', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}>
+                                                            <i className="fab fa-whatsapp"></i> Grup WhatsApp
+                                                        </a>
+                                                    )}
+                                                    {course.wa_mentor && (
+                                                        <a href={course.wa_mentor} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '9px 14px', background: '#128c7e', color: 'white', borderRadius: '7px', textDecoration: 'none', fontSize: '13px', fontWeight: '600' }}>
+                                                            <i className="fab fa-whatsapp"></i> Chat Mentor
+                                                        </a>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -263,16 +260,39 @@ function Dashboard({ setIsLoggedIn }) {
                         <div className="dashboard-section">
                             <div className="section-header"><h2>Mentor Saya</h2></div>
                             <div className="mentors-list">
-                                {mentors.map((mentor) => (
-                                    <div key={mentor.id} className="mentor-item">
-                                        <img src={mentor.image} alt={mentor.name} onError={(e) => e.target.src='https://via.placeholder.com/50'} />
-                                        <div className="mentor-info">
-                                            <h4>{mentor.name}</h4>
-                                            <p>{mentor.title}</p>
-                                            <button className="btn btn-sm btn-primary" onClick={() => handleChatClick(mentor)}>Chat</button>
+                                {myMentors.length === 0 ? (
+                                    <p style={{color:'#94a3b8', fontStyle:'italic', padding:'10px 0'}}>
+                                        Belum ada mentor. Beli kursus terlebih dahulu.
+                                    </p>
+                                ) : (
+                                    myMentors.map((mentor) => (
+                                        <div key={mentor.id} className="mentor-item">
+                                            <img
+                                                src={mentor.image ? `http://localhost:8080/Neo-skul-main/Neo-skul-main${mentor.image}` : 'https://via.placeholder.com/50'}
+                                                alt={mentor.name}
+                                                onError={(e) => e.target.src='https://via.placeholder.com/50'}
+                                            />
+                                            <div className="mentor-info">
+                                                <h4>{mentor.name}</h4>
+                                                <p style={{margin:'2px 0', color:'#64748b', fontSize:'0.85rem'}}>{mentor.title}</p>
+                                                <p style={{margin:'2px 0 6px 0', color:'#2563eb', fontSize:'0.78rem', fontWeight:'600'}}>
+                                                    📚 {mentor.courses?.join(', ')}
+                                                </p>
+                                                {mentor.phone && (
+                                                    <a
+                                                        href={`https://wa.me/${mentor.phone}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="btn btn-sm"
+                                                        style={{textDecoration:'none', background:'#25d366', color:'white', display:'inline-flex', alignItems:'center', gap:'5px', padding:'6px 12px', borderRadius:'6px', fontSize:'0.82rem', fontWeight:'600'}}
+                                                    >
+                                                        <i className="fab fa-whatsapp"></i> Chat
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
