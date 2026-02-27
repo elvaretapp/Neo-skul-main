@@ -189,11 +189,12 @@ function MentorDashboard() {
             formData.append('title', data.title)
             formData.append('description', data.description)
             formData.append('price', data.price)
-            formData.append('type', data.type)
+            formData.append('type', 'course')
             formData.append('mentor_id', mentorId)
-            formData.append('drive_link', data.drive_link || '')
             formData.append('wa_group', data.wa_group || '')
             formData.append('wa_mentor', data.wa_mentor || '')
+            // schedule_days menyimpan JSON jadwal per hari
+            formData.append('schedule_days', data.schedule_days || '{}')
             if (data.image instanceof File) formData.append('image', data.image)
 
             if (modalMode === 'delete') {
@@ -238,9 +239,6 @@ function MentorDashboard() {
                     <button className={activeTab === 'courses' ? 'active' : ''} onClick={() => setActiveTab('courses')}>
                         <i className="fas fa-book-open"></i> Kelola Kursus
                     </button>
-                    <button className={activeTab === 'schedule' ? 'active' : ''} onClick={() => setActiveTab('schedule')}>
-                        <i className="fas fa-calendar-alt"></i> Jadwal Mengajar
-                    </button>
                     <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
                         <i className="fas fa-user-circle"></i> Edit Profil
                     </button>
@@ -280,21 +278,7 @@ function MentorDashboard() {
                             </div>
                         </div>
 
-                        {/* Jadwal Ringkas di Dashboard */}
-                        <div className="section-title" style={{ marginTop: '30px' }}>
-                            <h2>Jadwal Mengajar Anda</h2>
-                            <button className="btn-text" onClick={() => setActiveTab('schedule')}>Atur Jadwal →</button>
-                        </div>
-                        <div className="schedule-summary">
-                            {HARI.map(hari => (
-                                <div key={hari} className={`schedule-day-badge ${profileData.schedule[hari] ? 'active' : ''}`}>
-                                    <span>{hari.slice(0, 3)}</span>
-                                    {profileData.schedule[hari] && (
-                                        <small>{profileData.schedule[hari].mulai} - {profileData.schedule[hari].selesai}</small>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
+                      
 
                         <div className="section-title" style={{ marginTop: '30px' }}>
                             <h2>Kursus Terbaru Anda</h2>
@@ -332,19 +316,35 @@ function MentorDashboard() {
                                         <h3>{course.title}</h3>
                                         <p className="price">{formatRupiah(course.price)}</p>
                                         
-                                        {/* Status Link */}
+                                        {/* Jadwal per hari */}
+                                        {course.schedule_days && (() => {
+                                            let sched = {}
+                                            try { sched = JSON.parse(course.schedule_days) } catch(e) {}
+                                            const days = Object.entries(sched)
+                                            if (days.length === 0) return null
+                                            return (
+                                                <div style={{margin:'6px 0', background:'#dbeafe', borderRadius:'8px', padding:'7px 10px'}}>
+                                                    <p style={{fontSize:'0.75rem', fontWeight:'700', color:'#1e40af', margin:'0 0 5px', display:'flex', alignItems:'center', gap:'5px'}}>
+                                                        <i className="fas fa-calendar-check"></i> Jadwal
+                                                    </p>
+                                                    {days.map(([hari, jam]) => (
+                                                        <div key={hari} style={{fontSize:'0.78rem', color:'#1e3a8a', display:'flex', justifyContent:'space-between', padding:'2px 0', borderBottom:'1px dashed #bfdbfe'}}>
+                                                            <span style={{fontWeight:'600'}}>{hari}</span>
+                                                            <span>{jam.mulai} – {jam.selesai}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )
+                                        })()}
+
                                         <div className="course-links-status">
-                                            <span className={`link-badge ${course.drive_link ? 'has-link' : 'no-link'}`} title={course.drive_link || 'Belum ada link'}>
-                                                <i className="fab fa-google-drive"></i>
-                                            </span>
-                                            <span className={`link-badge ${course.wa_group ? 'has-link' : 'no-link'}`} title={course.wa_group || 'Belum ada WA Grup'}>
+                                            <span className={`link-badge ${course.wa_group ? 'has-link' : 'no-link'}`}>
                                                 <i className="fab fa-whatsapp"></i> Grup
                                             </span>
-                                            <span className={`link-badge ${course.wa_mentor ? 'has-link' : 'no-link'}`} title={course.wa_mentor || 'Belum ada WA Mentor'}>
+                                            <span className={`link-badge ${course.wa_mentor ? 'has-link' : 'no-link'}`}>
                                                 <i className="fab fa-whatsapp"></i> Mentor
                                             </span>
                                         </div>
-
                                         <div className="card-actions">
                                             <button className="btn-icon edit" onClick={() => handleEdit(course)}><i className="fas fa-edit"></i></button>
                                             <button className="btn-icon delete" onClick={() => handleDelete(course)}><i className="fas fa-trash"></i></button>
@@ -352,75 +352,6 @@ function MentorDashboard() {
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* --- TAB: JADWAL --- */}
-                {activeTab === 'schedule' && (
-                    <div className="tab-section">
-                        <div className="section-title"><h2>Atur Jadwal Mengajar</h2></div>
-                        <div className="schedule-container">
-                            <div className="schedule-info-card">
-                                <i className="fas fa-info-circle"></i>
-                                <p>Centang hari yang Anda tersedia, lalu atur jam mulai dan selesai. Klik <strong>Simpan Jadwal</strong> setelah selesai.</p>
-                            </div>
-
-                            <div className="schedule-grid">
-                                {HARI.map(hari => (
-                                    <div key={hari} className={`schedule-card ${profileData.schedule[hari] ? 'active' : ''}`}>
-                                        <div className="schedule-card-header">
-                                            <label className="schedule-checkbox">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={!!profileData.schedule[hari]}
-                                                    onChange={() => handleScheduleToggle(hari)}
-                                                />
-                                                <span className="checkmark"></span>
-                                                <span className="day-name">{hari}</span>
-                                            </label>
-                                        </div>
-                                        {profileData.schedule[hari] && (
-                                            <div className="schedule-time">
-                                                <div className="time-input-group">
-                                                    <label>Mulai</label>
-                                                    <input
-                                                        type="time"
-                                                        value={profileData.schedule[hari].mulai}
-                                                        onChange={(e) => handleScheduleTime(hari, 'mulai', e.target.value)}
-                                                    />
-                                                </div>
-                                                <span className="time-separator">—</span>
-                                                <div className="time-input-group">
-                                                    <label>Selesai</label>
-                                                    <input
-                                                        type="time"
-                                                        value={profileData.schedule[hari].selesai}
-                                                        onChange={(e) => handleScheduleTime(hari, 'selesai', e.target.value)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="schedule-price">
-                                <label><i className="fas fa-tag"></i> Harga per Pertemuan (Rp)</label>
-                                <input
-                                    type="number"
-                                    name="price_per_session"
-                                    value={profileData.price_per_session}
-                                    onChange={handleProfileChange}
-                                    placeholder="Contoh: 150000"
-                                    min="0"
-                                />
-                                <small>Harga ini akan ditampilkan di halaman katalog mentor</small>
-                            </div>
-
-                            <button className="btn-save-profile" onClick={handleSaveProfile} style={{ marginTop: '20px' }}>
-                                <i className="fas fa-save"></i> Simpan Jadwal
-                            </button>
                         </div>
                     </div>
                 )}
@@ -478,7 +409,7 @@ function MentorDashboard() {
                     </div>
                 )}
             </main>
-            <CRUDModal isOpen={showModal} onClose={() => setShowModal(false)} mode={modalMode} type="course" data={selectedCourse} onSave={handleSaveCourse} />
+            <CRUDModal isOpen={showModal} onClose={() => setShowModal(false)} mode={modalMode} type="course" subType="course" data={selectedCourse} onSave={handleSaveCourse} />
         </div>
     )
 }

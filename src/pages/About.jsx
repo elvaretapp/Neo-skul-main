@@ -13,6 +13,16 @@ function About() {
             <section className="about-content">
                 <div className="container">
                     <div className="about-section">
+                       
+                        <p>
+                            NeoScholar adalah marketplace edukasi berbasis teknologi yang menyediakan jual beli berbagai media pembelajaran, 
+                            mulai dari media cetak, digital, hingga teknologi pendidikan seperti AR/VR. Selain itu, NeoScholar juga menyediakan layanan bimbingan belajar 
+                            dan persiapan UTBK untuk membantu siswa menemukan mentor sesuai kebutuhan. NeoScholar hadir untuk memperluas akses sekolah, guru, dan siswa terhadap media pembelajaran inovatif 
+                            melalui platform yang sederhana, mudah digunakan, dan dikembangkan secara bertahap.
+                        </p>
+                    </div>
+
+                    <div className="about-section">
                         <h2>Visi Kami</h2>
                         <p>
                             Menjadi platform edukasi terdepan yang menghubungkan teknologi inovatif dengan pembelajaran berkualitas,

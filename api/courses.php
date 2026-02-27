@@ -37,17 +37,15 @@ switch ($method) {
         $description = $_POST['description'] ?? '';
         $price = $_POST['price'] ?? '';
         $type = $_POST['type'] ?? 'General';
-        $mentor_id = $_POST['mentor_id'] ?? null;
+        $mentor_id = (!empty($_POST['mentor_id']) && $_POST['mentor_id'] !== '') ? $_POST['mentor_id'] : null;
         $id = $_POST['id'] ?? null;
         $drive_link = $_POST['drive_link'] ?? '';
         $wa_group = $_POST['wa_group'] ?? '';
         $wa_mentor = $_POST['wa_mentor'] ?? '';
+        $schedule_days = $_POST['schedule_days'] ?? '';
+        $schedule_time = $_POST['schedule_time'] ?? '';
 
-        if (!$id && !$mentor_id) {
-            http_response_code(400);
-            echo json_encode(["message" => "Mentor ID required"]);
-            exit;
-        }
+        // mentor_id boleh null untuk produk admin
 
         // --- Logic Upload Image ---
         $imagePath = null;
@@ -67,13 +65,13 @@ switch ($method) {
             if ($id) {
                 // === UPDATE ===
                 if ($imagePath) {
-                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, image=?, drive_link=?, wa_group=?, wa_mentor=? WHERE id=?";
+                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, image=?, drive_link=?, wa_group=?, wa_mentor=?, schedule_days=?, schedule_time=? WHERE id=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->execute([$title, $description, $price, $type, $imagePath, $drive_link, $wa_group, $wa_mentor, $id]);
+                    $stmt->execute([$title, $description, $price, $type, $imagePath, $drive_link, $wa_group, $wa_mentor, $schedule_days, $schedule_time, $id]);
                 } else {
-                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, drive_link=?, wa_group=?, wa_mentor=? WHERE id=?";
+                    $sql = "UPDATE courses SET title=?, description=?, price=?, type=?, drive_link=?, wa_group=?, wa_mentor=?, schedule_days=?, schedule_time=? WHERE id=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->execute([$title, $description, $price, $type, $drive_link, $wa_group, $wa_mentor, $id]);
+                    $stmt->execute([$title, $description, $price, $type, $drive_link, $wa_group, $wa_mentor, $schedule_days, $schedule_time, $id]);
                 }
                 echo json_encode(["message" => "Course updated successfully"]);
 
@@ -81,10 +79,10 @@ switch ($method) {
                 // === CREATE ===
                 if (!$imagePath) $imagePath = '/assets/images/products/Tamplateedukasi.jpeg';
 
-                $sql = "INSERT INTO courses (title, description, price, type, image, mentor_id, drive_link, wa_group, wa_mentor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO courses (title, description, price, type, image, mentor_id, drive_link, wa_group, wa_mentor, schedule_days, schedule_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 
-                if($stmt->execute([$title, $description, $price, $type, $imagePath, $mentor_id, $drive_link, $wa_group, $wa_mentor])) {
+                if($stmt->execute([$title, $description, $price, $type, $imagePath, $mentor_id, $drive_link, $wa_group, $wa_mentor, $schedule_days, $schedule_time])) {
                     echo json_encode(["message" => "Course created successfully"]);
                 } else {
                     http_response_code(500);

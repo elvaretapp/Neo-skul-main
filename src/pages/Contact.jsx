@@ -19,7 +19,7 @@ function Contact() {
                                 <i className="fas fa-map-marker-alt"></i>
                                 <div>
                                     <h3>Alamat</h3>
-                                    <p>Jl. Pendidikan No. 123, Jakarta</p>
+                                    <p>Jl. Lidah Wetan Gg. IXB No. 70b, Lakarsantri, Surabaya</p>
                                 </div>
                             </div>
                             <div className="contact-item">
@@ -33,7 +33,21 @@ function Contact() {
                                 <i className="fas fa-envelope"></i>
                                 <div>
                                     <h3>Email</h3>
-                                    <p>info@neoscholar.id</p>
+                                    <p>neoscholar.25@gmail.com</p>
+                                </div>
+                            </div>
+                            <div className="contact-item">
+                                <i className="fab fa-instagram"></i>
+                                <div>
+                                    <h3>Instagram</h3>
+                                    <p>neoscholar_id</p>
+                                </div>
+                            </div>
+                            <div className="contact-item">
+                                <i className="fab fa-tiktok"></i>
+                                <div>
+                                    <h3>TikTok</h3>
+                                    <p>neoscholar_</p>
                                 </div>
                             </div>
                         </div>

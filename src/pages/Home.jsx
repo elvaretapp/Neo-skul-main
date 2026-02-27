@@ -28,21 +28,22 @@ function Home({ isLoggedIn }) {
         }
     }, [isLoggedIn])
 
-    // Fetch Data Produk dari Database
+    // Fetch Data Produk dari Database (hanya produk admin: ebook/vr/game)
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('/neo-scholar/api/courses.php')
+                const response = await fetch('/api/courses.php')
                 if (!response.ok) throw new Error('Network response was not ok')
                 const data = await response.json()
-                setProducts(data)
+                // Filter hanya produk admin (bukan course mentor)
+                const adminProducts = data.filter(p => p.type !== 'course' && p.type !== '')
+                setProducts(adminProducts)
             } catch (error) {
                 console.error("Gagal mengambil data produk:", error)
             } finally {
                 setLoadingProducts(false)
             }
         }
-
         fetchProducts()
     }, [])
 

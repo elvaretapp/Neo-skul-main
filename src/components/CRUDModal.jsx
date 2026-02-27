@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "../styles/CRUDModal.css";
 
-function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
+function CRUDModal({ isOpen, onClose, mode, type, subType = 'product', data, onSave }) {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -16,21 +16,23 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
     drive_link: "",
     wa_group: "",
     wa_mentor: "",
+    schedule_days: "",
+    schedule_time: "",
   });
 
   useEffect(() => {
     if (data && (mode === "edit" || mode === "delete")) {
       setFormData({
         ...data,
-        // PERBAIKAN: Mapping 'username' dari database ke 'name' di form
         name: data.name || data.username || "", 
         image: null,
         type: data.type || data.category || "",
-        // Tambahkan ini:
         price: data.price ? Math.round(data.price) : "",
         drive_link: data.drive_link || "",
         wa_group: data.wa_group || "",
         wa_mentor: data.wa_mentor || "",
+        schedule_days: data.schedule_days || "",
+        schedule_time: data.schedule_time || "",
       });
     } else {
       setFormData({
@@ -47,6 +49,8 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
         drive_link: "",
         wa_group: "",
         wa_mentor: "",
+        schedule_days: "",
+        schedule_time: "",
       });
     }
   }, [data, mode, isOpen]);
@@ -75,8 +79,8 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
       <div className="crud-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="crud-modal-header">
           <h2>
-            {mode === "create" ? "Add" : mode === "edit" ? "Edit" : "Delete"}{" "}
-            {type === "user" ? "User" : "Course"}
+            {mode === "create" ? "Tambah" : mode === "edit" ? "Edit" : "Hapus"}{" "}
+            {type === "user" ? "User" : subType === 'product' ? "Produk Pembelajaran" : "Kursus"}
           </h2>
           <button className="crud-close-btn" onClick={onClose}>
             <i className="fas fa-times"></i>
@@ -135,54 +139,116 @@ function CRUDModal({ isOpen, onClose, mode, type, data, onSave }) {
                   </div>
                 </>
               ) : (
-                /* --- FORM COURSE (TIDAK BERUBAH) --- */
+                /* --- FORM PRODUK / KURSUS --- */
                 <>
                   <div className="form-group">
-                    <label>Course Title</label>
+                    <label>Judul</label>
                     <input type="text" name="title" value={formData.title} onChange={handleChange} required />
                   </div>
                   <div className="form-group">
-                    <label>Description</label>
+                    <label>Deskripsi</label>
                     <textarea name="description" value={formData.description} onChange={handleChange} required rows="4"></textarea>
                   </div>
                   <div className="form-group">
-                    <label>Price</label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      min="0"
-                      required
-                      onChange={handleChange}
-                    />
+                    <label>Harga (Rp)</label>
+                    <input type="number" name="price" value={formData.price} min="0" required onChange={handleChange} />
                   </div>
                   <div className="form-group">
-                    <label>Type</label>
+                    <label>Tipe</label>
                     <select name="type" value={formData.type} onChange={handleChange} required>
-                      <option value="" disabled>Select Type</option>
-                      <option value="ar-vr">AR/VR</option>
-                      <option value="animation">Animation</option>
-                      <option value="programming">Programming</option>
-                      <option value="design">Design</option>
-                      <option value="other">Other</option>
+                      <option value="" disabled>-- Pilih Tipe --</option>
+                      {subType === 'product' ? (
+                        <>
+                          <option value="ebook">E-Book</option>
+                          <option value="vr">AR/VR</option>
+                          <option value="game">Game Edukasi</option>
+                        </>
+                      ) : (
+                        <option value="course">Course / Jadwal</option>
+                      )}
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Course Image (Upload)</label>
+                    <label>Gambar</label>
                     <input type="file" name="image" onChange={handleChange} accept="image/*" className="file-input" />
                   </div>
-                  <div className="form-group">
-                    <label><i className="fab fa-google-drive" style={{marginRight:'6px', color:'#4285f4'}}></i>Link Google Drive (Materi)</label>
-                    <input type="url" name="drive_link" value={formData.drive_link || ''} onChange={handleChange} placeholder="https://drive.google.com/..." />
-                  </div>
-                  <div className="form-group">
-                    <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Link WA Grup</label>
-                    <input type="url" name="wa_group" value={formData.wa_group || ''} onChange={handleChange} placeholder="https://chat.whatsapp.com/..." />
-                  </div>
-                  <div className="form-group">
-                    <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Link WA Mentor</label>
-                    <input type="url" name="wa_mentor" value={formData.wa_mentor || ''} onChange={handleChange} placeholder="https://wa.me/628..." />
-                  </div>
+                  {subType === 'product' ? (
+                    <div className="form-group">
+                      <label><i className="fab fa-google-drive" style={{marginRight:'6px', color:'#4285f4'}}></i>Link Google Drive (Materi)</label>
+                      <input type="url" name="drive_link" value={formData.drive_link || ''} onChange={handleChange} placeholder="https://drive.google.com/..." />
+                    </div>
+                  ) : (
+                    <>
+                      {/* JADWAL PER HARI */}
+                      <div className="form-group">
+                        <label><i className="fas fa-calendar-alt" style={{marginRight:'6px', color:'#2563eb'}}></i>Jadwal Pertemuan</label>
+                        <p style={{fontSize:'0.78rem', color:'#94a3b8', margin:'2px 0 10px'}}>Klik hari untuk mengaktifkan, lalu atur jam mulai & selesai</p>
+                        <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
+                          {['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'].map(hari => {
+                            // Parse schedule_days sebagai JSON
+                            let scheduleObj = {}
+                            try { scheduleObj = JSON.parse(formData.schedule_days || '{}') } catch(e) {}
+                            const isActive = !!scheduleObj[hari]
+
+                            const toggleHari = () => {
+                              let obj = {}
+                              try { obj = JSON.parse(formData.schedule_days || '{}') } catch(e) {}
+                              if (obj[hari]) {
+                                delete obj[hari]
+                              } else {
+                                obj[hari] = { mulai: '08:00', selesai: '10:00' }
+                              }
+                              setFormData(prev => ({ ...prev, schedule_days: JSON.stringify(obj) }))
+                            }
+
+                            const updateJam = (field, val) => {
+                              let obj = {}
+                              try { obj = JSON.parse(formData.schedule_days || '{}') } catch(e) {}
+                              if (obj[hari]) obj[hari][field] = val
+                              setFormData(prev => ({ ...prev, schedule_days: JSON.stringify(obj) }))
+                            }
+
+                            return (
+                              <div key={hari} style={{border: isActive ? '1.5px solid #2563eb' : '1.5px solid #e2e8f0', borderRadius:'10px', overflow:'hidden'}}>
+                                <div
+                                  onClick={toggleHari}
+                                  style={{display:'flex', alignItems:'center', gap:'10px', padding:'10px 14px', cursor:'pointer', background: isActive ? '#eff6ff' : '#f8fafc', userSelect:'none'}}
+                                >
+                                  <div style={{width:'20px', height:'20px', borderRadius:'50%', border: isActive ? '2px solid #2563eb' : '2px solid #cbd5e1', background: isActive ? '#2563eb' : 'white', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                                    {isActive && <i className="fas fa-check" style={{color:'white', fontSize:'10px'}}></i>}
+                                  </div>
+                                  <span style={{fontWeight: isActive ? '700' : '500', color: isActive ? '#1d4ed8' : '#475569', fontSize:'0.9rem'}}>{hari}</span>
+                                </div>
+                                {isActive && (() => {
+                                  let obj = {}
+                                  try { obj = JSON.parse(formData.schedule_days || '{}') } catch(e) {}
+                                  return (
+                                    <div style={{display:'flex', gap:'12px', alignItems:'center', padding:'10px 14px', background:'#f0f9ff', borderTop:'1px solid #bae6fd'}}>
+                                      <span style={{fontSize:'0.8rem', color:'#0369a1', fontWeight:'600', minWidth:'30px'}}>Mulai</span>
+                                      <input type="time" value={obj[hari]?.mulai || '08:00'} onChange={e => updateJam('mulai', e.target.value)}
+                                        style={{border:'1px solid #bae6fd', borderRadius:'6px', padding:'5px 8px', fontSize:'0.88rem', color:'#0c4a6e'}} />
+                                      <span style={{color:'#94a3b8'}}>—</span>
+                                      <span style={{fontSize:'0.8rem', color:'#0369a1', fontWeight:'600', minWidth:'40px'}}>Selesai</span>
+                                      <input type="time" value={obj[hari]?.selesai || '10:00'} onChange={e => updateJam('selesai', e.target.value)}
+                                        style={{border:'1px solid #bae6fd', borderRadius:'6px', padding:'5px 8px', fontSize:'0.88rem', color:'#0c4a6e'}} />
+                                    </div>
+                                  )
+                                })()}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Link WA Grup</label>
+                        <input type="url" name="wa_group" value={formData.wa_group || ''} onChange={handleChange} placeholder="https://chat.whatsapp.com/..." />
+                      </div>
+                      <div className="form-group">
+                        <label><i className="fab fa-whatsapp" style={{marginRight:'6px', color:'#25d366'}}></i>Link WA Mentor</label>
+                        <input type="url" name="wa_mentor" value={formData.wa_mentor || ''} onChange={handleChange} placeholder="https://wa.me/628..." />
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>

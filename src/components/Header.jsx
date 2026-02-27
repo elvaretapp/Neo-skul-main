@@ -132,16 +132,13 @@ function Header({ isLoggedIn, setIsLoggedIn }) {
                             </Link>
                         </li>
                         <li>
-                            <a
-                                href="#mentor"
-                                className="nav-link"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    scrollToSection('mentor')
-                                }}
+                            <Link
+                                to="/mentor"
+                                className={`nav-link ${location.pathname === '/mentor' ? 'active' : ''}`}
+                                onClick={() => setMobileMenuOpen(false)}
                             >
                                 Mentor
-                            </a>
+                            </Link>
                         </li>
                         <li>
                             <a
