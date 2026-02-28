@@ -221,10 +221,7 @@ function AdminDashboard({ setIsLoggedIn }) {
                             {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
                         </button>
                     ))}
-                    <button className="admin-nav-btn reports-btn" onClick={() => setShowReportsModal(true)}>
-                        <i className="fas fa-chart-line"></i>
-                        <span>Analytics & Reports</span>
-                    </button>
+                    
                 </nav>
 
                 <div className="admin-sidebar-footer">
@@ -342,7 +339,7 @@ function AdminDashboard({ setIsLoggedIn }) {
                                 <p className="empty-msg">Belum ada transaksi.</p>
                             ) : (
                                 <div className="table-wrap">
-                                    <table className="data-table">
+                                    <table className="data-table applications-table">
                                         <thead>
                                             <tr><th>User</th><th>Item</th><th>Total</th><th>Bukti</th><th>Status</th><th>Aksi</th></tr>
                                         </thead>
@@ -426,7 +423,7 @@ function AdminDashboard({ setIsLoggedIn }) {
                                 <p className="empty-msg">Tidak ada pengajuan mentor baru.</p>
                             ) : (
                                 <div className="table-wrap">
-                                    <table className="data-table">
+                                    <table className="data-table applications-table">
                                         <thead>
                                             <tr><th>Pemohon</th><th>Keahlian</th><th>Pengalaman</th><th>Sosmed & CV</th><th>Alasan</th><th>Tanggal</th><th>Aksi</th></tr>
                                         </thead>
@@ -443,17 +440,29 @@ function AdminDashboard({ setIsLoggedIn }) {
                                                             {app.linkedin && <a href={app.linkedin} target="_blank" rel="noreferrer" style={{fontSize:'0.82rem',color:'#0077b5'}}><i className="fab fa-linkedin"></i> LinkedIn</a>}
                                                         </div>
                                                     </td>
-                                                    <td><div style={{maxWidth:'180px',fontSize:'0.85rem',color:'#374151'}}>{app.reason}</div></td>
-                                                    <td>{new Date(app.created_at).toLocaleDateString('id-ID')}</td>
                                                     <td>
-                                                        <div style={{display:'flex',flexDirection:'column',gap:'6px',minWidth:'160px'}}>
+                                                        <div title={app.reason} style={{
+                                                            fontSize:'0.83rem', color:'#374151',
+                                                            display:'-webkit-box',
+                                                            WebkitLineClamp: 3,
+                                                            WebkitBoxOrient:'vertical',
+                                                            overflow:'hidden',
+                                                            lineHeight:'1.5',
+                                                            cursor:'help'
+                                                        }}>
+                                                            {app.reason}
+                                                        </div>
+                                                    </td>
+                                                    <td style={{whiteSpace:'nowrap'}}>{new Date(app.created_at).toLocaleDateString('id-ID')}</td>
+                                                    <td>
+                                                        <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
                                                             <button className="btn-sm btn-success" onClick={() => handleApplicationStatus(app.id,'approved')}><i className="fas fa-check"></i> Approve</button>
                                                             <textarea
-                                                                placeholder="Tulis alasan penolakan..."
+                                                                placeholder="Alasan penolakan..."
                                                                 value={rejectReasonMap[app.id] || ''}
                                                                 onChange={(e) => setRejectReasonMap(prev => ({...prev,[app.id]:e.target.value}))}
                                                                 rows="2"
-                                                                style={{fontSize:'0.78rem',padding:'5px 8px',borderRadius:'6px',border:'1px solid #e2e8f0',resize:'none',fontFamily:'inherit',width:'100%'}}
+                                                                style={{fontSize:'0.76rem',padding:'5px 8px',borderRadius:'6px',border:'1px solid #e2e8f0',resize:'none',fontFamily:'inherit',width:'100%',boxSizing:'border-box'}}
                                                             />
                                                             <button className="btn-sm btn-danger" onClick={() => handleApplicationStatus(app.id,'rejected')}><i className="fas fa-times"></i> Reject</button>
                                                         </div>

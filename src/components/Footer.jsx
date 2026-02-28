@@ -55,17 +55,7 @@ function Footer() {
                         </div>
                     </div>
 
-                    {/* Kolom 2: Navigasi Cepat */}
-                    <div className="footer-column">
-                        <h3>Akses Cepat</h3>
-                        <ul className="footer-links">
-                            <li><Link to="/">Beranda</Link></li>
-                            <li><Link to="/about">Tentang Kami</Link></li>
-                            <li><a href="#product" onClick={(e) => scrollToSection(e, 'product')}>Produk Unggulan</a></li>
-                            <li><Link to="/categories">Kategori Belajar</Link></li>
-                            <li><a href="#mentor" onClick={(e) => scrollToSection(e, 'mentor')}>Daftar Mentor</a></li>
-                        </ul>
-                    </div>
+                   
 
                     {/* Kolom 3: Kategori & Kontak */}
                     <div className="footer-column">
@@ -73,15 +63,16 @@ function Footer() {
                         <ul className="contact-info">
                             <li>
                                 <i className="fas fa-map-marker-alt"></i>
-                                <span>Jl. Pendidikan No. 123, Jakarta Selatan, Indonesia</span>
+                                <span>Jl. Lidah Wetan Gg. IXB No. 70b, Lakarsantri, Surabaya</span>
                             </li>
                             <li>
                                 <i className="fas fa-phone-alt"></i>
-                                <span>+62 812 3456 7890</span>
+                                <span>+62 881-9505-545 (admin)</span>
+
                             </li>
                             <li>
                                 <i className="fas fa-envelope"></i>
-                                <span>info@neoscholar.id</span>
+                                <span>neoscholar.25@gmail.com</span>
                             </li>
                         </ul>
                     </div>

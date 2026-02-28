@@ -35,8 +35,49 @@ switch ($method) {
         }
         break;
 
-    // POST: kirim lamaran baru dari klien
+    // POST: bisa dari admin (approve/reject via FormData) atau dari klien (submit lamaran baru via JSON)
     case 'POST':
+        // Cek apakah ini dari admin (FormData dengan field 'id' dan 'status')
+        $isAdminAction = isset($_POST['id']) && isset($_POST['status']);
+
+        if ($isAdminAction) {
+            // === ADMIN: approve / reject lamaran ===
+            $id            = $_POST['id'] ?? null;
+            $status        = $_POST['status'] ?? null;
+            $reject_reason = $_POST['reject_reason'] ?? null;
+
+            if (!$id || !$status) {
+                http_response_code(400);
+                echo json_encode(["message" => "ID dan status wajib diisi"]);
+                exit();
+            }
+
+            try {
+                // Update status lamaran
+                $stmt = $conn->prepare("UPDATE mentor_applications SET status = ?, reject_reason = ? WHERE id = ?");
+                $stmt->execute([$status, $reject_reason, $id]);
+
+                // Jika approved, ubah role user jadi mentor
+                if ($status === 'approved') {
+                    $getApp = $conn->prepare("SELECT user_id, name, expertise FROM mentor_applications WHERE id = ?");
+                    $getApp->execute([$id]);
+                    $app = $getApp->fetch(PDO::FETCH_ASSOC);
+
+                    if ($app) {
+                        $updateUser = $conn->prepare("UPDATE users SET role = 'mentor', specialization = ? WHERE id = ?");
+                        $updateUser->execute([$app['expertise'], $app['user_id']]);
+                    }
+                }
+
+                echo json_encode(["success" => true, "message" => $status === 'approved' ? "Mentor berhasil disetujui!" : "Aplikasi ditolak."]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(["message" => "Error: " . $e->getMessage()]);
+            }
+            break;
+        }
+
+        // === CLIENT: kirim lamaran baru via JSON ===
         $data = json_decode(file_get_contents("php://input"), true);
 
         $user_id    = $data['user_id'] ?? null;

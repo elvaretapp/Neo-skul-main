@@ -82,20 +82,7 @@ function Login({ setIsLoggedIn }) {
             <div className="login-card">
                 <h2 className="login-title">Login ke NeoScholar</h2>
                 <form onSubmit={handleSubmit} className="login-form">
-                    {/* Visual Dropdown */}
-                    <div className="form-group">
-                        <label htmlFor="role" className="form-label">Login Sebagai</label>
-                        <select
-                            id="role"
-                            className="form-input"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                        >
-                            <option value="client">Siswa / Client</option>
-                            <option value="mentor">Mentor</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
+                    
 
                     <div className="form-group">
                         <label htmlFor="email" className="form-label">Email / Username</label>

@@ -23,10 +23,14 @@ function Contact() {
                                 </div>
                             </div>
                             <div className="contact-item">
-                                <i className="fas fa-phone"></i>
+                                <i className="fab fa-whatsapp"></i>
                                 <div>
-                                    <h3>Telepon</h3>
-                                    <p>+62 812 3456 7890</p>
+                                    <h3>WhatsApp</h3>
+                                    <p>+62 881-9505-545(admin)</p>
+                                    <p>Klik tombol berikut untuk bergabung dalam grup.</p>
+                                        <button onClick={() => window.open('https://chat.whatsapp.com/BWROjgyoXJq6FDBy2LMOKf?mode=gi_t', '_blank')}>
+                                            Bergabung ke Grup
+                                        </button>
                                 </div>
                             </div>
                             <div className="contact-item">
