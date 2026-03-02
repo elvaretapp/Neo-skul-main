@@ -188,9 +188,9 @@ function MentorPage() {
             </section>
             {/* MODAL DETAIL KURSUS */}
             {detailCourse && (
-                <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:'20px'}}
+               <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:1000, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'40px 20px', overflowY:'auto'}}
                      onClick={() => setDetailCourse(null)}>
-                    <div style={{background:'#fff', borderRadius:'16px', maxWidth:'480px', width:'100%', overflow:'hidden', boxShadow:'0 20px 60px rgba(0,0,0,0.2)'}}
+                    <div style={{background:'#fff', borderRadius:'16px', maxWidth:'480px', width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.2)', margin:'auto'}}
                          onClick={e => e.stopPropagation()}>
                         <img
                             src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${detailCourse.image}`}

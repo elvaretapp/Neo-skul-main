@@ -155,27 +155,40 @@ function MentorDashboard() {
     const handleSaveProfile = async (e) => {
         e.preventDefault()
         try {
+            const idToUse = profileData.id || mentorId || localStorage.getItem('user_id')
+            if (!idToUse) {
+                alert("Gagal: ID user tidak ditemukan. Coba logout dan login ulang.")
+                return
+            }
+
             const formData = new FormData()
             formData.append('action', 'update_profile')
-            const idToUse = mentorId || localStorage.getItem('user_id')
             formData.append('id', idToUse)
-            formData.append('username', profileData.username)
-            formData.append('email', profileData.email)
-            formData.append('specialization', profileData.specialization)
-            formData.append('bio', profileData.bio)
-            formData.append('category', profileData.category)
-            formData.append('price_per_session', profileData.price_per_session)
-            formData.append('schedule', JSON.stringify(profileData.schedule))
+            formData.append('username', profileData.username || '')
+            formData.append('email', profileData.email || '')
+            formData.append('specialization', profileData.specialization || '')
+            formData.append('bio', profileData.bio || '')
+            formData.append('category', profileData.category || '')
             formData.append('cv_link', profileData.cv_link || '')
             formData.append('phone', profileData.phone || '')
             if (avatarFile) formData.append('avatar', avatarFile)
 
             const res = await fetch('/api/users.php', { method: 'POST', body: formData })
-            if (res.ok) {
+            const text = await res.text()
+
+            let result
+            try { result = JSON.parse(text) } catch (e) { result = { message: text } }
+
+            if (res.ok && !result.message?.toLowerCase().includes('error')) {
                 alert("Profil berhasil diperbarui!")
-                fetchData(mentorId)
-            } else { alert("Gagal update profil") }
-        } catch (error) { alert("Terjadi kesalahan koneksi") }
+                setAvatarFile(null)
+                fetchData(idToUse)
+            } else {
+                alert("Gagal update profil: " + (result.message || 'Unknown error'))
+            }
+        } catch (error) {
+            alert("Terjadi kesalahan koneksi: " + error.message)
+        }
     }
 
     const handleCreate = () => { setModalMode('create'); setSelectedCourse(null); setShowModal(true) }

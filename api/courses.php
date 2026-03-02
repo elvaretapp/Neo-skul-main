@@ -18,13 +18,18 @@ switch ($method) {
         $mentor_id = isset($_GET['mentor_id']) ? $_GET['mentor_id'] : null;
 
         if ($mentor_id) {
-            // Filter berdasarkan mentor_id
-            $sql = "SELECT * FROM courses WHERE mentor_id = ? ORDER BY id DESC";
+            $sql = "SELECT c.*, u.username as mentor_name, u.avatar as mentor_avatar, u.phone as mentor_phone 
+                    FROM courses c 
+                    LEFT JOIN users u ON c.mentor_id = u.id 
+                    WHERE c.mentor_id = ? 
+                    ORDER BY c.id DESC";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$mentor_id]);
         } else {
-            // Ambil semua
-            $sql = "SELECT * FROM courses ORDER BY id DESC";
+            $sql = "SELECT c.*, u.username as mentor_name, u.avatar as mentor_avatar, u.phone as mentor_phone 
+                    FROM courses c 
+                    LEFT JOIN users u ON c.mentor_id = u.id 
+                    ORDER BY c.id DESC";
             $stmt = $conn->query($sql);
         }
         

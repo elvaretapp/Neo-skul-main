@@ -30,7 +30,10 @@ function AdminDashboard({ setIsLoggedIn }) {
     const totalUsers = users.length
     const activeMentors = users.filter(u => u.role === 'mentor').length
     const pendingMentors = mentorApplications.length
-    const totalRevenue = courses.reduce((sum, c) => sum + parseFloat(c.price || 0), 0)
+    const totalRevenue = transactions
+        .filter(t => t.status === 'approved' || t.status === 'success')
+        .reduce((sum, t) => sum + parseFloat(t.total_amount || 0), 0)
+    const totalEstKursus = courses.reduce((sum, c) => sum + parseFloat(c.price || 0), 0)
 
     const formatRupiah = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
 
@@ -257,7 +260,8 @@ function AdminDashboard({ setIsLoggedIn }) {
                                 { icon:'fa-users', val: totalUsers, label:'Total Users', color:'blue' },
                                 { icon:'fa-chalkboard-teacher', val: activeMentors, label:'Active Mentors', color:'green' },
                                 { icon:'fa-file-signature', val: pendingMentors, label:'Pending Mentors', color:'amber' },
-                                { icon:'fa-dollar-sign', val: formatRupiah(totalRevenue), label:'Est. Nilai Kursus', color:'violet' },
+                                { icon:'fa-dollar-sign', val: formatRupiah(totalRevenue), label:'Total Revenue', color:'violet' },
+                                { icon:'fa-book', val: formatRupiah(totalEstKursus), label:'Est. Nilai Kursus', color:'blue' },
                             ].map((s,i) => (
                                 <div key={i} className={`admin-stat-card ${s.color}`}>
                                     <div className="admin-stat-icon"><i className={`fas ${s.icon}`}></i></div>
@@ -276,7 +280,7 @@ function AdminDashboard({ setIsLoggedIn }) {
                                     { icon:'fa-user-plus', label:'Tambah User', desc:'Buat akun baru', action: handleCreateUser },
                                     { icon:'fa-box-open', label:'Tambah Produk', desc:'Produk pembelajaran baru', action: handleCreateProduct },
                                     { icon:'fa-envelope-open-text', label:'Aplikasi Mentor', desc:`${pendingMentors} menunggu review`, action: () => setActiveTab('applications') },
-                                    { icon:'fa-chart-line', label:'Lihat Reports', desc:'Analytics & insights', action: () => setShowReportsModal(true) },
+                                   
                                 ].map((q,i) => (
                                     <div key={i} className="quick-card" onClick={q.action}>
                                         <div className="quick-icon"><i className={`fas ${q.icon}`}></i></div>
