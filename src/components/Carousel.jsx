@@ -26,7 +26,7 @@ function Carousel({ items }) {
                             <div className="carousel-content">
                                 <h3>{item.title}</h3>
                                 <p>{item.description}</p>
-                                <div className="product-price">{item.price}</div>
+                                <div className="product-price">Rp {parseInt(item.price).toLocaleString('id-ID')}</div>
                                 <a href="#" className="btn btn-primary">Lihat Detail</a>
                             </div>
                         </div>

@@ -122,59 +122,8 @@ function Home({ isLoggedIn }) {
                 </div>
             </section>
 
-            {/* Search Section */}
-            <section className="search-section">
-                <div className="container">
-                    <div className="search-tabs">
-                        <div
-                            className={`search-tab ${activeTab === 'general' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('general')}
-                        >
-                            Cari Materi
-                        </div>
-                        <div
-                            className={`search-tab ${activeTab === 'ai' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('ai')}
-                        >
-                            Konsultasi AI
-                        </div>
-                    </div>
+{/* SEARCH*/}
 
-                    <div className="search-content">
-                        <div className={`search-panel ${activeTab === 'general' ? 'active' : ''}`}>
-                            <div className="search-container">
-                                <form className="search-box" onSubmit={handleSearch}>
-                                    <i className="fas fa-search search-icon"></i>
-                                    <input
-                                        type="text"
-                                        className="search-input"
-                                        placeholder="Cari materi pembelajaran, kursus, atau buku..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                    <button type="submit" className="search-button">Cari</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div className={`search-panel ${activeTab === 'ai' ? 'active' : ''}`}>
-                            <div className="search-container">
-                                <form className="search-box" onSubmit={handleAISearch}>
-                                    <i className="fas fa-robot search-icon"></i>
-                                    <input
-                                        type="text"
-                                        className="search-input"
-                                        placeholder="Tanyakan pada AI tentang pelajaran atau konsep yang sulit..."
-                                        value={aiQuery}
-                                        onChange={(e) => setAiQuery(e.target.value)}
-                                    />
-                                    <button type="submit" className="search-button ai-button">Konsultasi</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Best Seller Products */}
             <section className="bestseller section" id="product">

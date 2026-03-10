@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { verifySession, authFetch } from '../hooks/useAuth'
 import '../styles/Products.css'
 
 function Products() {
@@ -7,55 +8,66 @@ function Products() {
     const [loading, setLoading] = useState(true)
     const [filterType, setFilterType] = useState('All')
     const [detailItem, setDetailItem] = useState(null)
+    const [currentUser, setCurrentUser] = useState(null)
     const navigate = useNavigate()
+
+    // Cek session user (tidak redirect, hanya simpan info user)
+    useEffect(() => {
+        verifySession().then(user => setCurrentUser(user))
+    }, [])
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('/api/courses.php');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                const adminProducts = data.filter(p => p.type !== 'course' && p.type !== '');
-                setProducts(adminProducts);
+                const response = await fetch('/api/courses.php')
+                if (!response.ok) throw new Error('Network response was not ok')
+                const data = await response.json()
+                const adminProducts = data.filter(p => p.type !== 'course' && p.type !== '')
+                setProducts(adminProducts)
             } catch (error) {
-                console.error("Gagal mengambil data produk:", error);
+                console.error("Gagal mengambil data produk:", error)
             } finally {
-                setLoading(false);
+                setLoading(false)
             }
-        };
-        fetchProducts();
-    }, []);
+        }
+        fetchProducts()
+    }, [])
 
     const handleBuy = async (product) => {
-        const userId = localStorage.getItem('user_id');
-        if (!userId || userId === 'undefined') {
-            alert("Silakan login terlebih dahulu.");
-            navigate('/login');
-            return;
+        // Verifikasi session ke server dulu
+        const user = await verifySession()
+        if (!user) {
+            alert("Silakan login terlebih dahulu.")
+            navigate('/login')
+            return
+        }
+        if (user.role !== 'client') {
+            alert('Hanya pengguna (client) yang dapat membeli produk.')
+            return
         }
         try {
-            const response = await fetch('/api/cart.php', {
+            const response = await authFetch('/api/cart.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, course_id: product.id }),
-            });
-            const result = await response.json();
+                body: JSON.stringify({ user_id: user.id, course_id: product.id }),
+            })
+            const result = await response.json()
             if (response.ok) {
-                alert("Berhasil masuk keranjang!");
-                navigate('/cart');
+                alert("Berhasil masuk keranjang!")
+                navigate('/cart')
             } else {
-                alert("Gagal: " + result.message);
+                alert("Gagal: " + result.message)
             }
         } catch (error) {
-            alert("Terjadi kesalahan koneksi ke server.");
+            alert("Terjadi kesalahan koneksi ke server.")
         }
     }
 
     const filteredProducts = filterType === 'All'
         ? products
-        : products.filter(p => p.type === filterType);
+        : products.filter(p => p.type === filterType)
 
-    const types = ['All', ...new Set(products.map(p => p.type).filter(Boolean))];
+    const types = ['All', ...new Set(products.map(p => p.type).filter(Boolean))]
 
     return (
         <div className="products-page">
@@ -87,7 +99,7 @@ function Products() {
                             <div key={item.id} className="product-card-catalog">
                                 <div className="product-img-wrapper">
                                     <img
-                                        src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${item.image}`}
+                                        src={item.image}
                                         alt={item.title}
                                         onError={(e) => { e.target.src = '/assets/images/products/Tamplateedukasi.jpeg' }}
                                     />
@@ -99,18 +111,8 @@ function Products() {
                                     <div className="product-footer">
                                         <span className="product-price">Rp {parseInt(item.price).toLocaleString('id-ID')}</span>
                                         <div style={{display:'flex', gap:'8px'}}>
-                                            <button
-                                                className="btn-detail"
-                                                onClick={() => setDetailItem(item)}
-                                            >
-                                                Detail
-                                            </button>
-                                            <button
-                                                className="btn-buy"
-                                                onClick={() => handleBuy(item)}
-                                            >
-                                                Beli
-                                            </button>
+                                            <button className="btn-detail" onClick={() => setDetailItem(item)}>Detail</button>
+                                            <button className="btn-buy" onClick={() => handleBuy(item)}>Beli</button>
                                         </div>
                                     </div>
                                 </div>
@@ -130,12 +132,9 @@ function Products() {
                      onClick={() => setDetailItem(null)}>
                     <div style={{background:'#fff', borderRadius:'16px', maxWidth:'480px', width:'100%', overflow:'hidden', boxShadow:'0 20px 60px rgba(0,0,0,0.2)'}}
                          onClick={e => e.stopPropagation()}>
-                        <img
-                            src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${detailItem.image}`}
-                            alt={detailItem.title}
+                        <img src={detailItem.image} alt={detailItem.title}
                             style={{width:'100%', height:'220px', objectFit:'cover'}}
-                            onError={e => e.target.src = '/assets/images/products/Tamplateedukasi.jpeg'}
-                        />
+                            onError={e => e.target.src = '/assets/images/products/Tamplateedukasi.jpeg'} />
                         <div style={{padding:'24px'}}>
                             <span style={{fontSize:'0.78rem', background:'#ede9fe', color:'#6d28d9', padding:'3px 10px', borderRadius:'20px', fontWeight:'700', textTransform:'uppercase'}}>
                                 {detailItem.type}
@@ -151,8 +150,8 @@ function Products() {
                                         style={{padding:'9px 18px', border:'1.5px solid #e2e8f0', borderRadius:'8px', background:'white', color:'#64748b', cursor:'pointer', fontWeight:'600'}}>
                                         Tutup
                                     </button>
-                                    <button onClick={() => { setDetailItem(null); handleBuy(detailItem); }}
-                                        style={{padding:'9px 22px', background:'linear-gradient(135deg,#2563eb,#1d4ed8)', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:'600', fontSize:'0.95rem'}}>
+                                    <button onClick={() => { setDetailItem(null); handleBuy(detailItem) }}
+                                        style={{padding:'9px 22px', background:'linear-gradient(135deg,#2563eb,#1d4ed8)', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:'600'}}>
                                         <i className="fas fa-shopping-cart" style={{marginRight:'6px'}}></i>Beli
                                     </button>
                                 </div>

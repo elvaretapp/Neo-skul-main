@@ -25,6 +25,7 @@ function AdminDashboard({ setIsLoggedIn }) {
     const [courses, setCourses] = useState([])
     const [mentorApplications, setMentorApplications] = useState([])
     const [rejectReasonMap, setRejectReasonMap] = useState({})
+    const [expandedReasons, setExpandedReasons] = useState({})
     const [transactions, setTransactions] = useState([])
 
     const totalUsers = users.length
@@ -445,16 +446,21 @@ function AdminDashboard({ setIsLoggedIn }) {
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div title={app.reason} style={{
-                                                            fontSize:'0.83rem', color:'#374151',
-                                                            display:'-webkit-box',
-                                                            WebkitLineClamp: 3,
-                                                            WebkitBoxOrient:'vertical',
-                                                            overflow:'hidden',
-                                                            lineHeight:'1.5',
-                                                            cursor:'help'
-                                                        }}>
-                                                            {app.reason}
+                                                        <div style={{fontSize:'0.83rem', color:'#374151', lineHeight:'1.5'}}>
+                                                            {expandedReasons[app.id]
+                                                                ? app.reason
+                                                                : app.reason?.length > 100
+                                                                    ? app.reason.substring(0, 100) + '...'
+                                                                    : app.reason
+                                                            }
+                                                            {app.reason?.length > 100 && (
+                                                                <button
+                                                                    onClick={() => setExpandedReasons(prev => ({...prev, [app.id]: !prev[app.id]}))}
+                                                                    style={{display:'block', marginTop:'4px', background:'none', border:'none', color:'#2563eb', cursor:'pointer', fontSize:'0.78rem', fontWeight:'600', padding:0}}
+                                                                >
+                                                                    {expandedReasons[app.id] ? '▲ Lebih Sedikit' : '▼ Selengkapnya'}
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     </td>
                                                     <td style={{whiteSpace:'nowrap'}}>{new Date(app.created_at).toLocaleDateString('id-ID')}</td>
@@ -495,7 +501,7 @@ function AdminDashboard({ setIsLoggedIn }) {
                                 ) : courses.filter(c => c.type !== 'course').map(item => (
                                     <div key={item.id} className="course-item">
                                         <img
-                                            src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${item.image}`}
+                                            src={`${item.image}`}
                                             alt={item.title}
                                             onError={e => { e.target.onerror=null; e.target.src='https://via.placeholder.com/80?text=No+Img' }}
                                             style={{width:'80px',height:'80px',objectFit:'cover',borderRadius:'10px',border:'1px solid #e2e8f0',flexShrink:0}}
@@ -537,7 +543,7 @@ function AdminDashboard({ setIsLoggedIn }) {
                                 ) : courses.filter(c => c.type === 'course').map(course => (
                                     <div key={course.id} className="course-item">
                                         <img
-                                            src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${course.image}`}
+                                            src={`${course.image}`}
                                             alt={course.title}
                                             onError={e => { e.target.onerror=null; e.target.src='https://via.placeholder.com/80?text=No+Img' }}
                                             style={{width:'80px',height:'80px',objectFit:'cover',borderRadius:'10px',border:'1px solid #e2e8f0',flexShrink:0}}

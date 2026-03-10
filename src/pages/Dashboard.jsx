@@ -211,7 +211,7 @@ function Dashboard({ setIsLoggedIn }) {
                                     {myCourses.filter(c => c.type === 'course').map(course => (
                                         <div key={course.id} className="course-card-dashboard" style={{ display:'flex', flexDirection:'column', background:'#fff', borderRadius:'12px', overflow:'hidden', boxShadow:'0 2px 8px rgba(0,0,0,0.1)' }}>
                                             <img
-                                                src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${course.image}`}
+                                                src={`${course.image}`}
                                                 alt={course.title}
                                                 style={{ width:'100%', height:'140px', objectFit:'cover' }}
                                                 onError={(e) => { e.target.src = '/assets/images/products/Tamplateedukasi.jpeg'; }}
@@ -262,7 +262,7 @@ function Dashboard({ setIsLoggedIn }) {
                                     {myCourses.filter(c => c.type !== 'course').map(course => (
                                         <div key={course.id} className="course-card-dashboard" style={{ display:'flex', flexDirection:'column', background:'#fff', borderRadius:'12px', overflow:'hidden', boxShadow:'0 2px 8px rgba(0,0,0,0.1)' }}>
                                             <img
-                                                src={`http://localhost:8080/Neo-skul-main/Neo-skul-main${course.image}`}
+                                                src={`${course.image}`}
                                                 alt={course.title}
                                                 style={{ width:'100%', height:'140px', objectFit:'cover' }}
                                                 onError={(e) => { e.target.src = '/assets/images/products/Tamplateedukasi.jpeg'; }}
@@ -298,7 +298,7 @@ function Dashboard({ setIsLoggedIn }) {
                                 ) : myMentors.map((mentor) => (
                                     <div key={mentor.id} className="mentor-item">
                                         <img
-                                            src={mentor.image ? `http://localhost:8080/Neo-skul-main/Neo-skul-main${mentor.image}` : 'https://via.placeholder.com/50'}
+                                            src={mentor.image ? `${mentor.image}` : 'https://via.placeholder.com/50'}
                                             alt={mentor.name}
                                             onError={(e) => e.target.src='https://via.placeholder.com/50'}
                                         />

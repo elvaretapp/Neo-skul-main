@@ -36,20 +36,15 @@ function Login({ setIsLoggedIn }) {
                 setLoginMessage('Login berhasil! Mengalihkan...')
                 setMessageType('success')
 
-                // --- BAGIAN PENTING YANG DIPERBAIKI ---
+                // Simpan token dari server (bukan data user langsung)
+                localStorage.setItem('auth_token', data.token)
                 localStorage.setItem('userLoggedIn', 'true')
-                localStorage.setItem('username', data.user.name || data.user.username)
+                localStorage.setItem('username', data.user.username)
                 localStorage.setItem('userRole', data.user.role)
-                
-                // UBAH DARI 'userId' MENJADI 'user_id' (pakai underscore)
-                // Ini agar cocok dengan Product.jsx dan Cart.jsx
-                localStorage.setItem('user_id', data.user.id) 
-                
-                // Opsional: Simpan avatar jika ada
+                localStorage.setItem('user_id', data.user.id)
                 if (data.user.avatar) {
                     localStorage.setItem('userAvatar', data.user.avatar)
                 }
-                // --------------------------------------
 
                 setIsLoggedIn(true)
 
