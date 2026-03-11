@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { verifySession, authFetch } from '../hooks/useAuth'
+import { authFetch } from '../hooks/useAuth'
 import '../styles/Products.css'
 
 function Products() {
@@ -8,13 +8,7 @@ function Products() {
     const [loading, setLoading] = useState(true)
     const [filterType, setFilterType] = useState('All')
     const [detailItem, setDetailItem] = useState(null)
-    const [currentUser, setCurrentUser] = useState(null)
     const navigate = useNavigate()
-
-    // Cek session user (tidak redirect, hanya simpan info user)
-    useEffect(() => {
-        verifySession().then(user => setCurrentUser(user))
-    }, [])
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -34,14 +28,18 @@ function Products() {
     }, [])
 
     const handleBuy = async (product) => {
-        // Verifikasi session ke server dulu
-        const user = await verifySession()
-        if (!user) {
+        // Cek localStorage langsung (konsisten dengan App.jsx & ProtectedRoute)
+        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true'
+        const token = localStorage.getItem('auth_token')
+        const role = localStorage.getItem('userRole')
+        const userId = localStorage.getItem('user_id')
+
+        if (!isLoggedIn || !token) {
             alert("Silakan login terlebih dahulu.")
             navigate('/login')
             return
         }
-        if (user.role !== 'client') {
+        if (role !== 'client') {
             alert('Hanya pengguna (client) yang dapat membeli produk.')
             return
         }
@@ -49,7 +47,7 @@ function Products() {
             const response = await authFetch('/api/cart.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: user.id, course_id: product.id }),
+                body: JSON.stringify({ user_id: userId, course_id: product.id }),
             })
             const result = await response.json()
             if (response.ok) {

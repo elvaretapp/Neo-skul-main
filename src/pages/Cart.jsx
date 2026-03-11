@@ -1,28 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { verifySession, authFetch } from '../hooks/useAuth'
+import { authFetch } from '../hooks/useAuth'
 import '../styles/App.css'
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([])
     const [loading, setLoading] = useState(true)
-    const [currentUser, setCurrentUser] = useState(null)
-    const [sessionChecked, setSessionChecked] = useState(false)
     const navigate = useNavigate()
 
+    const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true'
+    const token = localStorage.getItem('auth_token')
+    const userId = localStorage.getItem('user_id')
+
     useEffect(() => {
-        const init = async () => {
-            const user = await verifySession()
-            setCurrentUser(user)
-            setSessionChecked(true)
+        if (!isLoggedIn || !token) {
+            setLoading(false)
+            return
+        }
 
-            if (!user) {
-                setLoading(false)
-                return
-            }
-
+        const fetchCart = async () => {
             try {
-                const response = await authFetch(`/api/cart.php?user_id=${user.id}`)
+                const response = await authFetch(`/api/cart.php?user_id=${userId}`)
                 const data = await response.json()
                 setCartItems(Array.isArray(data) ? data : [])
             } catch (error) {
@@ -31,7 +29,7 @@ const Cart = () => {
                 setLoading(false)
             }
         }
-        init()
+        fetchCart()
     }, [])
 
     const handleRemove = async (cartId) => {
@@ -48,11 +46,11 @@ const Cart = () => {
         } catch (error) { console.error(error) }
     }
 
-    if (!sessionChecked || loading) {
+    if (loading) {
         return <div className="container section" style={{marginTop:'100px', textAlign:'center'}}>Memuat...</div>
     }
 
-    if (!currentUser) {
+    if (!isLoggedIn || !token) {
         return (
             <div className="container section" style={{marginTop:'100px', textAlign:'center'}}>
                 <p>Silakan login terlebih dahulu.</p>

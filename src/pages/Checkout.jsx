@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Checkout.css'; // Import CSS baru
+import { authFetch } from '../hooks/useAuth';
+import '../styles/Checkout.css';
 
 const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -10,20 +11,21 @@ const Checkout = () => {
     const [isFetching, setIsFetching] = useState(true);
     const navigate = useNavigate();
     const userId = localStorage.getItem('user_id');
+    const token = localStorage.getItem('auth_token');
 
     // Load data keranjang
     useEffect(() => {
-        if (!userId) {
+        if (!userId || !token) {
             navigate('/login');
             return;
         }
-        
+
         const fetchCart = async () => {
             try {
-                // Pastikan URL API sesuai dengan nama folder di htdocs (neo-scholar atau neo-skul)
-                const response = await fetch(`/api/cart.php?user_id=${userId}`);
+                // Pakai authFetch agar token ikut terkirim
+                const response = await authFetch(`/api/cart.php?user_id=${userId}`);
                 const data = await response.json();
-                
+
                 if (Array.isArray(data)) {
                     setCartItems(data);
                 } else {
@@ -37,7 +39,7 @@ const Checkout = () => {
         };
 
         fetchCart();
-    }, [userId, navigate]);
+    }, [userId, token, navigate]);
 
     // Hitung Total
     const totalPrice = cartItems.reduce((total, item) => total + parseFloat(item.price), 0);
@@ -54,7 +56,7 @@ const Checkout = () => {
     // Handle Submit Checkout
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (cartItems.length === 0) {
             alert("Keranjang belanja Anda kosong.");
             return;
@@ -65,7 +67,7 @@ const Checkout = () => {
             return;
         }
 
-        if(!confirm("Apakah Anda yakin data pembayaran sudah benar?")) return;
+        if (!confirm("Apakah Anda yakin data pembayaran sudah benar?")) return;
 
         setLoading(true);
 
@@ -73,8 +75,7 @@ const Checkout = () => {
         formData.append('user_id', userId);
         formData.append('total_amount', totalPrice);
         formData.append('proof', proofFile);
-        
-        // Mapping data agar sesuai struktur database (course_id & price)
+
         const itemsPayload = cartItems.map(item => ({
             course_id: item.course_id || item.product_id || item.id,
             price: item.price
@@ -84,11 +85,14 @@ const Checkout = () => {
         try {
             const response = await fetch('/api/checkout.php', {
                 method: 'POST',
+                headers: {
+                    'X-Auth-Token': token
+                },
                 body: formData,
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 alert("Checkout Berhasil! Transaksi Anda sedang diverifikasi admin.");
                 navigate('/dashboard');
@@ -111,13 +115,13 @@ const Checkout = () => {
         <div className="checkout-page">
             <div className="checkout-container">
                 <h2 className="checkout-title">Konfirmasi Pembayaran</h2>
-                
+
                 <form onSubmit={handleSubmit} className="checkout-grid">
-                    
+
                     {/* BAGIAN KIRI: RINGKASAN PESANAN */}
                     <div className="checkout-card order-summary-card">
                         <h3>Ringkasan Pesanan</h3>
-                        
+
                         {cartItems.length === 0 ? (
                             <p className="empty-msg">Keranjang kosong.</p>
                         ) : (
@@ -145,8 +149,7 @@ const Checkout = () => {
                     {/* BAGIAN KANAN: FORM PEMBAYARAN */}
                     <div className="checkout-card payment-card">
                         <h3>Metode Pembayaran</h3>
-                        
-                        {/* Kartu Bank Visual */}
+
                         <div className="bank-card">
                             <span className="bank-logo">BANK BCA</span>
                             <span className="bank-number">1234 5678 9000</span>
@@ -162,23 +165,21 @@ const Checkout = () => {
                             </p>
 
                             <label className="form-label">Upload Bukti Transfer</label>
-                            
-                            {/* Area Upload Custom */}
+
                             <label htmlFor="proof-upload" className="upload-area">
                                 <i className="fas fa-cloud-upload-alt upload-icon"></i>
                                 <div className="upload-text">
                                     {proofFile ? "Ganti File" : "Klik atau seret file ke sini"}
                                 </div>
-                                <input 
-                                    id="proof-upload" 
-                                    type="file" 
-                                    accept="image/*" 
-                                    onChange={handleFileChange} 
-                                    style={{display:'none'}} 
+                                <input
+                                    id="proof-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    style={{display:'none'}}
                                 />
                             </label>
 
-                            {/* Preview Gambar */}
                             {preview && (
                                 <div className="file-preview">
                                     <img src={preview} alt="Preview" className="preview-img" />
@@ -191,9 +192,9 @@ const Checkout = () => {
                             )}
                         </div>
 
-                        <button 
-                            type="submit" 
-                            className="btn-checkout" 
+                        <button
+                            type="submit"
+                            className="btn-checkout"
                             disabled={loading || cartItems.length === 0}
                         >
                             {loading ? 'Memproses...' : `Bayar Rp ${totalPrice.toLocaleString('id-ID')}`}

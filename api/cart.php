@@ -9,18 +9,40 @@ include_once 'config/database.php';
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method == 'OPTIONS') { http_response_code(200); exit(); }
 
-// Fungsi verifikasi token
+// Fungsi verifikasi token - sama persis dengan cara di auth.php
 function verifyToken($conn) {
+    $token = null;
+
+    // Cara 1: loop getallheaders() dengan strtolower (case-insensitive)
     $headers = getallheaders();
-    $token = $headers['X-Auth-Token'] ?? str_replace('Bearer ', '', $headers['Authorization'] ?? '') ?: null;
+    foreach ($headers as $key => $value) {
+        if (strtolower($key) === 'x-auth-token') {
+            $token = $value;
+            break;
+        }
+    }
+
+    // Cara 2: $_SERVER dengan HTTP_ prefix
+    if (!$token && isset($_SERVER['HTTP_X_AUTH_TOKEN'])) {
+        $token = $_SERVER['HTTP_X_AUTH_TOKEN'];
+    }
+
+    // Cara 3: Authorization header
+    if (!$token && isset($headers['Authorization'])) {
+        $token = str_replace('Bearer ', '', $headers['Authorization']);
+    }
+    if (!$token && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $token = str_replace('Bearer ', '', $_SERVER['HTTP_AUTHORIZATION']);
+    }
+
     if (!$token) return null;
+
     $stmt = $conn->prepare("SELECT u.id, u.role FROM user_sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ? AND s.expires_at > NOW()");
     $stmt->execute([$token]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 if ($method == 'POST') {
-    // Wajib login untuk tambah ke keranjang
     $user = verifyToken($conn);
     if (!$user) {
         http_response_code(401);
@@ -30,7 +52,7 @@ if ($method == 'POST') {
 
     $data = json_decode(file_get_contents("php://input"));
     $course_id = $data->course_id ?? null;
-    $user_id = $user['id']; // Ambil dari token, bukan dari request body
+    $user_id = $user['id'];
 
     if (!$course_id) {
         http_response_code(400);
@@ -57,7 +79,6 @@ if ($method == 'POST') {
 }
 
 elseif ($method == 'GET') {
-    // Wajib login untuk lihat keranjang
     $user = verifyToken($conn);
     if (!$user) {
         http_response_code(401);
@@ -95,7 +116,6 @@ elseif ($method == 'DELETE') {
         exit();
     }
 
-    // Pastikan cart milik user yang login
     $stmt = $conn->prepare("DELETE FROM carts WHERE id = ? AND user_id = ?");
     if ($stmt->execute([$cart_id, $user['id']])) {
         echo json_encode(["message" => "Item dihapus."]);
